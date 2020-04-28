@@ -1,0 +1,99 @@
+<configuration debug="true" scan="true" scanPeriod="24 hours">
+    <property name="LOG_DIR" value="logs"/>
+    <property name="FULL_LOG" value="full.log"/>
+    <property name="ERROR_LOG" value="error.log"/>
+    <property name="DEBUG_LOG" value="debug.log"/>
+
+    <appender name="Console-Appender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %green([%thread]) %highlight(%-5level) %cyan(%class{0}.%method:%L) : %msg%n
+            </pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+    </appender>
+
+    <appender name="Spam-File-Appender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/spam_full.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %class{0}.%method:%L : %msg%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/spam_full.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <maxFileSize>500MB</maxFileSize>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>100GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="File-Appender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/full.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %class{0}.%method:%L : %msg%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>logs/full.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <!-- each file should be at most 200MB, keep 60 days worth of history, but at most 20GB -->
+            <maxFileSize>500MB</maxFileSize>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>40GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="Debug-Appender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/debug.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %class{0}.%method:%L : %msg%n</pattern>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>logs/debug.log.%i</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>200MB</maxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <appender name="Error-Appender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/error.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %class{0}.%method:%L : %msg%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>logs/error.log.%i</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>100</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>50MB</maxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <root>
+        <!--        <appender-ref ref="File-Appender"/>-->
+        <appender-ref ref="Error-Appender"/>
+        <!--        <appender-ref ref="Spam-File-Appender"/>-->
+        <appender-ref ref="Console-Appender"/>
+    </root>
+</configuration>
