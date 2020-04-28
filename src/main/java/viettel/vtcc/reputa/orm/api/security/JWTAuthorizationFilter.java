@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import viettel.vtcc.reputa.orm.api.model.UserRequest;
 import viettel.vtcc.reputa.orm.api.repository.UserRequestRepository;
@@ -42,7 +43,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                                     HttpServletResponse res,
                                     FilterChain chain) throws IOException, ServletException {
         String header = req.getHeader(HEADER_STRING);
-        log.info(req.getRequestURL().toString());
         if (header == null || !header.startsWith(TOKEN_PREFIX)) {
             chain.doFilter(req, res);
             return;
@@ -51,9 +51,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(req, res);
-        return;
     }
-    
+
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
         String token = request.getHeader(HEADER_STRING);
@@ -69,22 +68,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                         new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
 //                log.info("user: {}, endpoint: {}", user, request.getRequestURI());
-                String id = user + "|" + request.getRequestURI();
-                synchronized (userRequestRepository) {
-                    UserRequest userRequest = userRequestRepository.findById(id).orElse(null);
-                    if (userRequest == null) {
-                        userRequest = new UserRequest();
-                        userRequest.setId(id);
-                        userRequest.setUsername(user);
-                        userRequest.setEndpoint(request.getRequestURI());
-                        userRequest.setCount(0);
-                    }
-//                    log.info("user request before: {}", JSON.encode(userRequest));
-                    userRequest.setCount(userRequest.getCount() + 1);
-                    userRequest = userRequestRepository.save(userRequest);
-                    log.info("user request: {}", JSON.encode(userRequest));
-                    return usernamePasswordAuthenticationToken;
-                }
+                return  usernamePasswordAuthenticationToken;
+
             }
             return null;
         }
